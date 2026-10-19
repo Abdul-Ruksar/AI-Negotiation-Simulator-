@@ -1,15 +1,34 @@
 
+
 require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
 const admin = require("firebase-admin");
 const { GoogleGenAI } = require("@google/genai");
+const fs = require("fs");
+const path = require("path");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors({ origin: "http://localhost:5173" }));
+const allowedOrigins = [
+  "http://localhost:5173",
+  process.env.FRONTEND_URL,
+].filter(Boolean);
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+  })
+);
+
 app.use(express.json({ limit: "1mb" }));
 
 // Check required environment variables
@@ -22,7 +41,18 @@ if (!process.env.FIREBASE_PROJECT_ID) {
 }
 
 // Initialize Firebase Admin
-const serviceAccount = require("./firebase-service-account.json");
+const credentialsPath =
+  process.env.GOOGLE_APPLICATION_CREDENTIALS ||
+  path.join(__dirname, "firebase-service-account.json");
+
+const serviceAccount = JSON.parse(
+  fs.readFileSync(
+    path.isAbsolute(credentialsPath)
+      ? credentialsPath
+      : path.resolve(__dirname, credentialsPath),
+    "utf8"
+  )
+);
 
 if (!admin.apps.length) {
   admin.initializeApp({
@@ -34,14 +64,6 @@ if (!admin.apps.length) {
 // Initialize Gemini
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
-});
-
-// Health check
-app.get("/api/health", (req, res) => {
-  res.json({
-    status: "ok",
-    message: "Negotiation backend is running",
-  });
 });
 
 // Verify Firebase login
