@@ -1123,7 +1123,7 @@ function NegotiationPage({ scenario, settings, started, onBack, onRestart, execu
         `Description: ${selectedAgent.description || ""}`,
       ].join("\n");
 
-      const response = await fetch("http://localhost:5000/api/negotiate", {
+      const response = await fetch("https://ai-negotiation-backend.onrender.com/api/negotiate", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
