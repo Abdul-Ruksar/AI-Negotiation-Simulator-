@@ -1,0 +1,13 @@
+node_modules/
+.env
+.env.*
+!.env.example
+backend/.env
+backend/firebase-service-account.json
+frontend/dist/
+backend/dist/
+*.log
+.DS_Store
+Thumbs.db
+backend/.json
+backend/firebase-service-account.json
