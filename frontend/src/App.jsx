@@ -1030,7 +1030,7 @@ function NegotiationPage({ scenario, settings, started, onBack, onRestart, execu
       const agent = agents[turn % 2];
 
       const response = await fetch(
-        "http://localhost:5000/api/negotiate",
+        "https://ai-negotiation-backend.onrender.com/api/negotiate",
         {
           method: "POST",
           headers: {
